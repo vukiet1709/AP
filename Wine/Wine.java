@@ -3,13 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package AP_Project.Wine;
-
 /**
  *
  * @author VNTK_White
  */
 public class Wine extends BaseEntity {
-    private static int nextId = 1;
     private String name;
     private String type;
     private String vineyardName;
@@ -20,6 +18,7 @@ public class Wine extends BaseEntity {
     public Wine() {
         super();
     }
+    @Override
     public void setId(int id) {
     super.setId(id);
 }
@@ -79,4 +78,5 @@ public class Wine extends BaseEntity {
                 ", Vineyard: " + getVineyardName() + ", Vintage: " + getVintage() + 
                 ", Country: " + getCountry() + ", Price: " + getPrice();
     }
+    
 }

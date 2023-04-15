@@ -11,8 +11,7 @@ import java.util.*;
  */
 public class Main {
 
-    public static void main(String[] args) {
-        brands = new ArrayList<>();
+    public static void main(String[] args) {  
         Scanner scanner = new Scanner(System.in);
         List<Wine> wines = new ArrayList<>();
         List<WineBottle> wineBottles = new ArrayList<>();
@@ -76,10 +75,15 @@ public class Main {
                 System.out.println("Enter wine ID to delete:");
                 int deleteId = scanner.nextInt();
                 boolean deleted = false;
-                for (Wine w : wines) {
+                for (int i = 0; i < wines.size(); i++) {
+                    Wine w = wines.get(i);
                     if (w.getId() == deleteId) {
-                        wines.remove(w);
+                        wines.remove(i);
                         deleted = true;
+                        // update remaining wine IDs
+                        for (int j = i; j < wines.size(); j++) {
+                            wines.get(j).setId(j + 1);
+                        }
                         break;
                     }
                 }
@@ -87,21 +91,24 @@ public class Main {
                     System.out.println("Wine with ID " + deleteId + " deleted successfully.");
                 } else {
                     System.out.println("Wine with ID " + deleteId + " not found.");
-                }}
+                }
+            }
             case 3 -> {
                 System.out.println("Enter wine ID to find:");
                 int findId = scanner.nextInt();
                 boolean found = false;
                 for (Wine w : wines) {
                     if (w.getId() == findId) {
-                        System.out.println("Wine found: " + w.getName());
+                        System.out.printf("%-10s %-20s %-15s %-15s %-15s %-10s\n", "ID", "Name", "Type", "Vineyard", "Vintage", "Price");
+                        System.out.printf("%-10s %-20s %-15s %-15s %-15s %-10.2f\n", w.getId(), w.getName(), w.getType(), w.getVineyardName(), w.getVintage(), w.getPrice());
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
                     System.out.println("Wine with ID " + findId + " not found.");
-                }}
+                }
+            }
             case 4 -> {
                 System.out.println("All Wines:");
                 for (Wine w : wines) {
@@ -154,11 +161,12 @@ public class Main {
             System.out.println("2. Update an existing wine bottle");
             System.out.println("3. Remove a wine bottle");
             System.out.println("4. View all wine bottles");
-            System.out.println("5. Exit");
-
+            System.out.println("5. Find wine bottles");
+            System.out.println("6. Exit");
+            
             int choice = scanner.nextInt();
             scanner.nextLine();
-
+            
             switch (choice) {
                 case 1 -> {
                     WineBottle wineBottle = new WineBottle();
@@ -181,12 +189,11 @@ public class Main {
                     int numGrapes = scanner.nextInt();
                     scanner.nextLine();
                     for (int i = 0; i < numGrapes; i++) {
-                        System.out.println("Enter grape variety #" + (i + 1) + ":");
-                        wineBottle.addGrapeVariety(scanner.nextLine());
-                        wineBottles.add(wineBottle);
-                        System.out.println("Wine bottle added successfully.");
-                        }
-
+                    System.out.println("Enter grape variety #" + (i + 1) + ":");
+                    wineBottle.addGrapeVariety(scanner.nextLine());
+                    }
+                    wineBottles.add(wineBottle);
+                    System.out.println("Wine bottle added successfully.");
                 }
                     case 2 -> {
                         System.out.println("Enter the ID of the wine bottle to update:");
@@ -232,9 +239,16 @@ public class Main {
                     System.out.println("Enter the ID of the wine bottle to remove:");
                     int idToRemove = scanner.nextInt();
                     scanner.nextLine();
-
                     boolean removed = wineBottles.removeIf(w -> w.getId() == idToRemove);
-                    System.out.println(removed ? "Wine bottle removed successfully." : "Wine bottle not found.");
+                    if (removed) {
+                        System.out.println("Wine bottle removed successfully.");
+                        // Re-assign IDs of wine bottles after removal
+                        for (int i = 0; i < wineBottles.size(); i++) {
+                            wineBottles.get(i).setId(i + 1);
+                        }
+                    } else {
+                        System.out.println("Wine bottle not found.");
+                    }
                 }
 
                 case 4 -> {
@@ -248,7 +262,27 @@ public class Main {
                         });
                     }
                 }
-                case 5 -> {
+                 case 5 -> {
+                    System.out.println("Enter the ID of the wine bottle to find:");
+                    int idToFind = scanner.nextInt();
+                    scanner.nextLine();
+
+                    WineBottle wineBottle = null;
+                    for (WineBottle wb : wineBottles) {
+                        if (wb.getId() == idToFind) {
+                            wineBottle = wb;
+                            break;
+                        }
+                    }
+
+                    if (wineBottle == null) {
+                        System.out.println("Wine bottle not found.");
+                    } else {
+                        System.out.printf("Producer name: %s | Quantity: %d | Volume: %.2f | Bottle code: %s | Grape varieties: %s\n",
+                                wineBottle.getProducerName(), wineBottle.getQuantity(), wineBottle.getVolume(), wineBottle.getBottleCode(), wineBottle.getGrapeVarieties());
+                    }
+                }
+                case 6 -> {
                     exit = true;
                     System.out.println("Exiting wine bottle management system.");
                 }
@@ -260,16 +294,23 @@ public class Main {
      
     private static void manageBrands(Scanner scanner, List<Brand> brands) {
     int choice = 0;
-    while (choice != 5) {
+    while (choice != 6) {
         System.out.println("Choose an option:");
         System.out.println("1. View all brands");
         System.out.println("2. Add a new brand");
         System.out.println("3. Delete a brand");
         System.out.println("4. Update a brand");
-        System.out.println("5. Exit");
+        System.out.println("5. Find a Brand");
+        System.out.println("6. Exit");
         System.out.print("Option: ");
         choice = scanner.nextInt();
-
+         try {
+            choice = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid choice. Please enter a number.");
+            scanner.next(); // consume the invalid input
+            continue;
+        }
          switch (choice) {
             case 1 -> {
                 for (Brand brand : brands) {
@@ -323,9 +364,25 @@ public class Main {
                     System.out.println("Brand not found");
                 }
             }
-            case 5 -> System.out.println("Exiting...");
+            case 5 ->{
+                System.out.println("Enter brand code to find:");
+                String codeToFind = scanner.next();
+                boolean brandFound = false;
+                for (Brand brand : brands) {
+                    if (brand.getCode().equals(codeToFind)) {
+                        System.out.println(brand.getCode() + " - " + brand.getName());
+                        brandFound = true;
+                        break;
+                    }
+                }
+                if (!brandFound) {
+                    System.out.println("Brand not found");
+                }
+            }
+            case 6 -> System.out.println("Exiting...");
             default -> System.out.println("Invalid choice");
         }
+
     }
 }
 }
